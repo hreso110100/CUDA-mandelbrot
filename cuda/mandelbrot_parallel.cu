@@ -75,7 +75,6 @@ int main(int argc, char** argv) {
 __global__ void calculate(int height, int width, int max_iterations, double *red_pixels, double *green_pixels, double *blue_pixels) {
 	int id = blockIdx.x * blockDim.x + threadIdx.x; // generating unique thread index
 	int total_pixels = height * width;
-	double color_factor = 0.1;
 
 	while (id < total_pixels) {
 		int c = id / width;
@@ -88,17 +87,17 @@ __global__ void calculate(int height, int width, int max_iterations, double *red
 
 		double c_real = (x_axis_offset + c)/300;
 		double c_img = (y_axis_offset - r)/300;
-		double z_real = 0.0, z_imag = 0.0, z_real_old = 0.0, z_imag_old = 0.0;
+		double z_real = 0.0, z_imag = 0.0, z_real_tmp = 0.0, z_img_tmp = 0.0;
 		double absolut = 0.0;
 
 		int iter = 0;
 
 		while (iter < max_iterations && absolut <= 4.0) {
-			z_real = z_real_old*z_real_old - z_imag_old*z_imag_old + c_real;
-			z_imag = 2.0*z_real_old*z_imag_old + c_img;
+			z_real = z_real_tmp*z_real_tmp - z_img_tmp*z_img_tmp + c_real;
+			z_imag = 2.0*z_real_tmp*z_img_tmp + c_img;
 			absolut = z_real*z_real + z_imag*z_imag;
-			z_real_old = z_real;
-			z_imag_old = z_imag;
+			z_real_tmp = z_real;
+			z_img_tmp = z_imag;
 
 			iter++;
 		}
@@ -111,10 +110,15 @@ __global__ void calculate(int height, int width, int max_iterations, double *red
 		}
 		else {
 			// pixel bude zvyrazneny
-			red_pixels[currentIndex] = (double)pow(((double) iter)/((double)max_iterations), color_factor);
+			red_pixels[currentIndex] = pow(((double) iter)/((double)max_iterations), 0.25);
 			green_pixels[currentIndex] = 1.0;
-			blue_pixels[currentIndex] = 1.0;
+
+			if (iter < max_iterations) {
+				blue_pixels[currentIndex] = 1.0;
+			}else {
+				blue_pixels[currentIndex] = 0.0;
+			}
 		}
-		id += blockDim.x * gridDim.x; //grid-type loop, specific to CUDA
+		id += blockDim.x * gridDim.x; //grid-type loop, specificke pre CUDU
 	}
 }
