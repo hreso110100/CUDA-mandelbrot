@@ -1,39 +1,31 @@
 package sk.tuke;
 
-import java.io.*;
-import java.util.Scanner;
-
 import edu.rit.color.HSB;
 import edu.rit.image.PJGColorImage;
-import edu.rit.image.PJGImage;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import javax.imageio.ImageIO;
 
 class Main {
-    static int height, width;
-    static int[][] matrix;
-    static PJGColorImage image;
-    static File outputFileName;
+
+    static int height = 800, width = 800;
 
     public static void main(String[] args) throws Exception {
+        int[][] matrix = new int[height][width];
+        BufferedReader reader = new BufferedReader(new FileReader("cuda/output.txt"));
 
-        height = Integer.parseInt(args[0]);
-        width = Integer.parseInt(args[1]);
-
-        matrix = new int[height][width];
-        image = new PJGColorImage(height, width, matrix);
-
-        outputFileName = new File(args[3]);
-        Scanner in = new Scanner(new FileReader(args[2]));
-
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                float r = in.nextFloat();
-                float g = in.nextFloat();
-                float b = in.nextFloat();
-                matrix[i][j] = HSB.pack(r, g, b);
+                String[] r = reader.readLine().split(",");
+                matrix[i][j] = HSB.pack(Float.parseFloat(r[0]), Float.parseFloat(r[1]), Float.parseFloat(r[2]));
             }
+        }
+        BufferedImage image = new PJGColorImage(height, width, matrix).getBufferedImage();
 
-        PJGImage.Writer writer = image.prepareToWrite(new BufferedOutputStream(new FileOutputStream(outputFileName)));
-        writer.write();
-        writer.close();
+        File outputFile = new File("result.png");
+        ImageIO.write(image, "png", outputFile);
+
     }
 }
