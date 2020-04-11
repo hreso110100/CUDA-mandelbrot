@@ -1,0 +1,13 @@
+# CUDA Files
+
+/cuda/*.exe
+/cuda/*.exp
+/cuda/*.lib
+/cuda/*.txt
+
+# IDEA
+/out/*
+/idea/*
+
+# Generated
+result.png

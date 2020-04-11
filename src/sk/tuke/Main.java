@@ -26,6 +26,5 @@ class Main {
 
         File outputFile = new File("result.png");
         ImageIO.write(image, "png", outputFile);
-
     }
 }

@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 	// Maximalny pocet iteracii v ktorych bude prebiehat vypocet
 	const int MAX_ITERATIONS = 100000;
 
-	int total_pixels = (HEIGHT*WIDTH);
+	int total_pixels = HEIGHT*WIDTH;
 	cudaEvent_t start_time, end_time;
 	float result_time = 0;
 
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 __global__ void calculate(int height, int width, int max_iterations, double *red_pixels, double *green_pixels, double *blue_pixels) {
 	int id = blockIdx.x * blockDim.x + threadIdx.x; // generating unique thread index
 	int total_pixels = height * width;
-	double color_factor = 0.5;
+	double color_factor = 0.1;
 
 	while (id < total_pixels) {
 		int c = id / width;
@@ -83,20 +83,22 @@ __global__ void calculate(int height, int width, int max_iterations, double *red
 
 		int currentIndex = c + (r * width);
 
-		double xoffset = -(width-1)/2.0;
-		double yoffset = (height-1)/2.0;
+		double x_axis_offset = -(width)/1.4;
+		double y_axis_offset = (height)/2.0;
 
-		double c_real = (xoffset + c)/300;
-		double c_img = (yoffset - r)/300;
-		double z_real = 0.0, z_imag = 0.0;
+		double c_real = (x_axis_offset + c)/300;
+		double c_img = (y_axis_offset - r)/300;
+		double z_real = 0.0, z_imag = 0.0, z_real_old = 0.0, z_imag_old = 0.0;
 		double absolut = 0.0;
 
 		int iter = 0;
 
 		while (iter < max_iterations && absolut <= 4.0) {
-			z_real = z_real*z_real - z_imag*z_imag + c_real;
-			z_imag = 2.0*z_real*z_imag + c_img;
+			z_real = z_real_old*z_real_old - z_imag_old*z_imag_old + c_real;
+			z_imag = 2.0*z_real_old*z_imag_old + c_img;
 			absolut = z_real*z_real + z_imag*z_imag;
+			z_real_old = z_real;
+			z_imag_old = z_imag;
 
 			iter++;
 		}
@@ -105,7 +107,7 @@ __global__ void calculate(int height, int width, int max_iterations, double *red
 			// pixel bude zafarbeny na cierno
 			red_pixels[currentIndex] = 0.0;
 			green_pixels[currentIndex] = 0.0;
-			blue_pixels[currentIndex] = 0.0f;
+			blue_pixels[currentIndex] = 0.0;
 		}
 		else {
 			// pixel bude zvyrazneny
