@@ -73,50 +73,55 @@ int main(int argc, char** argv) {
 }
 
 __global__ void calculate(int height, int width, int max_iterations, double *red_pixels, double *green_pixels, double *blue_pixels) {
-	int id = blockIdx.x * blockDim.x + threadIdx.x; // generating unique thread index
+	int id = blockIdx.x * blockDim.x + threadIdx.x; // Unikatny index CUDA threadu
 	int total_pixels = height * width;
+	int zoom = 300;
+
+	// Centrovanie obrazku
+  double x_axis_offset = -(width)/1.4;
+  double y_axis_offset = (height)/2.0;
 
 	while (id < total_pixels) {
-		int c = id / width;
-		int r = id % height;
+		// suradnice v obrazku
+		int x = id / width;
+		int y = id % height;
 
-		int currentIndex = c + (r * width);
+		int current_index = x + (y * width);
 
-		double x_axis_offset = -(width)/1.4;
-		double y_axis_offset = (height)/2.0;
-
-		double c_real = (x_axis_offset + c)/300;
-		double c_img = (y_axis_offset - r)/300;
+		double c_real = (x_axis_offset + x)/zoom; // prevod suradnice x na komplexne cislo
+		double c_img = (y_axis_offset - y)/zoom; // prevod suradnice y na komplexne cislo
 		double z_real = 0.0, z_imag = 0.0, z_real_tmp = 0.0, z_img_tmp = 0.0;
-		double absolut = 0.0;
+		double absolute = 0.0;
 
 		int iter = 0;
 
-		while (iter < max_iterations && absolut <= 4.0) {
+    // Funkcia na otestovanie ci cislo c patri do mnoziny --> z_n+1=z_n^2+c
+    // Podmienka testu je |z| <=2
+		while (iter < max_iterations && absolute <= 4.0) {
 			z_real = z_real_tmp*z_real_tmp - z_img_tmp*z_img_tmp + c_real;
 			z_imag = 2.0*z_real_tmp*z_img_tmp + c_img;
-			absolut = z_real*z_real + z_imag*z_imag;
+			absolute = z_real*z_real + z_imag*z_imag;
+
 			z_real_tmp = z_real;
 			z_img_tmp = z_imag;
-
 			iter++;
 		}
 
 		if (iter == max_iterations) {
 			// pixel bude zafarbeny na cierno
-			red_pixels[currentIndex] = 0.0;
-			green_pixels[currentIndex] = 0.0;
-			blue_pixels[currentIndex] = 0.0;
+			red_pixels[current_index] = 0.0;
+			green_pixels[current_index] = 0.0;
+			blue_pixels[current_index] = 0.0;
 		}
 		else {
 			// pixel bude zvyrazneny
-			red_pixels[currentIndex] = pow(((double) iter)/((double)max_iterations), 0.25);
-			green_pixels[currentIndex] = 1.0;
+			red_pixels[current_index] = pow(((double) iter)/((double)max_iterations), 0.25);
+			green_pixels[current_index] = 1.0;
 
 			if (iter < max_iterations) {
-				blue_pixels[currentIndex] = 1.0;
+				blue_pixels[current_index] = 1.0;
 			}else {
-				blue_pixels[currentIndex] = 0.0;
+				blue_pixels[current_index] = 0.0;
 			}
 		}
 		id += blockDim.x * gridDim.x; //grid-type loop, specificke pre CUDU
