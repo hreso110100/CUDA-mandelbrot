@@ -11,7 +11,7 @@
 # IDEA
 /out/*
 /.idea/*
-CUDA-Mandelbrot.iml
+**/*.iml
 
 # Generated
 result.png
