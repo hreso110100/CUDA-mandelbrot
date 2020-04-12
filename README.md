@@ -52,4 +52,5 @@ Vyžaduje nainštalovanú javu, JDK 1.8 a Intellij IDEA.
 **V IDEI sa to dá následovne: File --> Project Structure --> Libraries, kliknúť na + a Java**
 
 Pre vygenerovanie obrázka je potrebné spustiť triedu Main.java v priečinku src/sk/tuke.
+
 Výsledkom je súbor s názvom result.png
