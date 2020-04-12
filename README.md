@@ -48,7 +48,7 @@ Výsledkom je súbor output.txt z ktorého neskôr vygenerujeme obrázok množin
 
 Vyžaduje nainštalovanú javu, JDK 1.8 a Intellij IDEA.
 
-**Poznámka: Pravdepobne bude treba pridať ručne knižnicu mandelbrot-vizualizer.java z priečinku lib.**
+**Poznámka: Pravdepobne bude treba pridať ručne knižnicu mandelbrot-vizualizer.jar z priečinku lib.**
 **V IDEI sa to dá následovne: File --> Project Structure --> Libraries, kliknúť na + a Java**
 
 Pre vygenerovanie obrázka je potrebné spustiť triedu Main.java v priečinku src/sk/tuke.
