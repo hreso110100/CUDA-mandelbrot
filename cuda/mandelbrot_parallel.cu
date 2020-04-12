@@ -4,7 +4,7 @@
 
 __global__ void calculate(int height, int width, int max_iterations, double *red_pixels, double *green_pixels, double *blue_pixels);
 
-int main(int argc, char** argv) {
+int main(int argc, char const *argv[]) {
 	// Rozmery obrazka
 	const int HEIGHT = 800;
 	const int WIDTH = 800;
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 	cudaEventSynchronize(end_time);
 	cudaEventElapsedTime(&result_time, start_time, end_time);
 
-	printf("Vypocer trval: %3.3f sekund.\n", result_time/1000);
+	printf("Vypocet trval: %.2f sekund.\n", result_time/1000);
 
 	//Presun dat z device do CPU
 	cudaMemcpy(cpu_red_array, device_red_array, total_pixels * sizeof(double), cudaMemcpyDeviceToHost);
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 __global__ void calculate(int height, int width, int max_iterations, double *red_pixels, double *green_pixels, double *blue_pixels) {
 	int id = blockIdx.x * blockDim.x + threadIdx.x; // Unikatny index CUDA threadu
 	int total_pixels = height * width;
-	int zoom = 300;
+	int zoom = 300; // priblizenie mnoziny
 
 	// Centrovanie obrazku
   double x_axis_offset = -(width)/1.4;

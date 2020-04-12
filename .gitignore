@@ -5,10 +5,13 @@
 /cuda/*.lib
 /cuda/*.txt
 
+# C Files
+/cuda/*.out
+
 # IDEA
 /out/*
 /.idea/*
-*.iml
+CUDA-Mandelbrot.iml
 
 # Generated
 result.png
